@@ -278,6 +278,16 @@ int main( int argc, char* args[] )
     rect_background.w = w;
     rect_background.h = h;
 
+    //Background start
+    int w2=0,h2=0;
+    background2 = IMG_LoadTexture(renderer,"start.png");
+    SDL_QueryTexture(background2, NULL, NULL, &w, &h);
+    bool start = false;
+    rect_background2.x = 0;
+    rect_background2.y = 0;
+    rect_background2.w = w;
+    rect_background2.h = h;
+
     //Personaje 1
     character = IMG_LoadTexture(renderer, "personaje/down1.png");
     SDL_QueryTexture(character, NULL, NULL, &w, &h);
@@ -447,6 +457,10 @@ int main( int argc, char* args[] )
         if(!Mix_PlayingMusic())
             Mix_PlayMusic(musica,1);
 
+        //Pantalla de start
+        if(currentKeyStates[ SDL_SCANCODE_SPACE ])
+            start = true;
+
         //Personaje 1
         while(collisionLayer(mapas_collision[mapa_actual],rect_character))
         {
@@ -546,6 +560,7 @@ int main( int argc, char* args[] )
             if(current_sprite2>1)
                 current_sprite2=0;
         }
+
 
 //        >>>>>>>>>>Velocity control<<<<<<<<<<<<<<<<<
 //        if(currentKeyStates[ SDL_SCANCODE_LSHIFT ])
@@ -660,6 +675,8 @@ int main( int argc, char* args[] )
             reload = false;
         }
         SDL_RenderCopy(renderer, Message, NULL, &Message_rect);
+        if(!start)
+            SDL_RenderCopy(renderer, background2, NULL, &rect_background2);
         SDL_RenderPresent(renderer);
         frame++;
     }
