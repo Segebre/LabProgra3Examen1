@@ -16,8 +16,8 @@ using namespace std;
 SDL_Window* window;
 SDL_Renderer* renderer;
 SDL_Event Event;
-SDL_Texture *background, *texture_tile,*character,*character2, *star, *Message;
-SDL_Rect rect_background, rect_character, rect_tile, rect_tileset, rect_character2, Message_rect, rect_star;
+SDL_Texture *background, *background2, *texture_tile,*character,*character2, *star, *Message;
+SDL_Rect rect_background, rect_background2, rect_character, rect_tile, rect_tileset, rect_character2, Message_rect, rect_star;
 SDL_Surface* surfaceMessage;
 TTF_Font *Sans;
 SDL_Color Color;
@@ -289,16 +289,16 @@ int main( int argc, char* args[] )
     //Personaje 2
     character2 = IMG_LoadTexture(renderer, "personaje/down12.png");
     SDL_QueryTexture(character2, NULL, NULL, &w, &h);
-    rect_character2.x = 450;
-    rect_character2.y = 150;
+    rect_character2.x = 200;
+    rect_character2.y = 200;
     rect_character2.w = w-4;
     rect_character2.h = h-4;
 
     //star
     star = IMG_LoadTexture(renderer, "personaje/star.png");
     SDL_QueryTexture(star, NULL, NULL, &w, &h);
-    rect_star.x = rand() % 468;
-    rect_star.y = rand() % 217;
+    rect_star.x = rand() % 289;
+    rect_star.y = rand() % 287;
     rect_star.w = w-4;
     rect_star.h = h-4;
 
@@ -448,6 +448,11 @@ int main( int argc, char* args[] )
             Mix_PlayMusic(musica,1);
 
         //Personaje 1
+        while(collisionLayer(mapas_collision[mapa_actual],rect_character))
+        {
+            rect_character.x = rand() % 289;
+            rect_character.y = rand() % 287;
+        }
         if(currentKeyStates[ SDL_SCANCODE_D ] && rect_character.x < 289)
         {
             rect_character.x+=velocity;
@@ -493,6 +498,11 @@ int main( int argc, char* args[] )
         }
 
         //Personaje 2
+        while(collisionLayer(mapas_collision[mapa_actual],rect_character2))
+        {
+            rect_character2.x = rand() % 289;
+            rect_character2.y = rand() % 287;
+        }
         if(currentKeyStates[ SDL_SCANCODE_RIGHT ] && rect_character2.x < 289)
         {
             rect_character2.x+=velocity;
@@ -554,16 +564,16 @@ int main( int argc, char* args[] )
 //------------------------------------------------
     while(collisionLayer(mapas_collision[mapa_actual],rect_star))
     {
-        rect_star.x = rand() % 468;
-        rect_star.y = rand() % 217;
+        rect_star.x = rand() % 289;
+        rect_star.y = rand() % 287;
     }
     if(collision(rect_character,rect_star))
     {
         Mix_PlayChannel(-1,sonido,0);
         do
         {
-            rect_star.x = rand() % 468;
-            rect_star.y = rand() % 217;
+            rect_star.x = rand() % 289;
+            rect_star.y = rand() % 287;
         }while(collisionLayer(mapas_collision[mapa_actual],rect_star));
         starCont++;
         reload = true;
@@ -577,8 +587,8 @@ int main( int argc, char* args[] )
         Mix_PlayChannel(-1,sonido,0);
         do
         {
-            rect_star.x = rand() % 468;
-            rect_star.y = rand() % 217;
+            rect_star.x = rand() % 289;
+            rect_star.y = rand() % 287;
         }while(collisionLayer(mapas_collision[mapa_actual],rect_star));
         starCont2++;
         reload = true;
@@ -634,7 +644,8 @@ int main( int argc, char* args[] )
         //SDL_RenderCopy(renderer, texture_npc, NULL, &rect_npc);
         if(starCont > 9 || starCont2 > 9)
         {
-            showTTF(varTTF.str(), 150);
+            showTTF(varTTF.str(), 50);
+            SDL_RenderCopy(renderer, Message, NULL, &Message_rect);
             SDL_RenderPresent(renderer);
             SDL_Delay(2500);
             starCont = 0;
@@ -645,7 +656,7 @@ int main( int argc, char* args[] )
         }
         else if(reload)
         {
-            showTTF(varTTF.str(), 220);
+            showTTF(varTTF.str(), 135);
             reload = false;
         }
         SDL_RenderCopy(renderer, Message, NULL, &Message_rect);

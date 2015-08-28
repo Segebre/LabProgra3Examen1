@@ -319,8 +319,8 @@
   <object name="warp" x="8" y="24" width="15" height="6">
    <properties>
     <property name="mapa" value="mapa2"/>
-    <property name="x" value="20"/>
-    <property name="y" value="20"/>
+    <property name="x" value="50"/>
+    <property name="y" value="50"/>
    </properties>
   </object>
  </objectgroup>
