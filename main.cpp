@@ -16,8 +16,8 @@ using namespace std;
 SDL_Window* window;
 SDL_Renderer* renderer;
 SDL_Event Event;
-SDL_Texture *background, *texture_npc, *texture_tile,*character,*character2, *star, *Message;
-SDL_Rect rect_background, rect_character, rect_npc, rect_tile, rect_tileset, rect_character2, Message_rect, rect_star;
+SDL_Texture *background, *texture_tile,*character,*character2, *star, *Message;
+SDL_Rect rect_background, rect_character, rect_tile, rect_tileset, rect_character2, Message_rect, rect_star;
 SDL_Surface* surfaceMessage;
 TTF_Font *Sans;
 SDL_Color Color;
@@ -260,17 +260,64 @@ int main( int argc, char* args[] )
         return 30;
     }
 
-    //Init textures
+    //TTF init
+    TTF_Init();
+    Sans = TTF_OpenFont("match.ttf", 17); //this opens a font style and sets a size
+    Color = {255, 255, 255};
+
+    //------------------------------------------------
+    //|>>>>>>>>>>>>>>>>>Init textures<<<<<<<<<<<<<<<<|
+    //------------------------------------------------
+
+    //Background
     int w=0,h=0;
     background = IMG_LoadTexture(renderer,"fondo.png");
     SDL_QueryTexture(background, NULL, NULL, &w, &h);
-    rect_background.x = 0; rect_background.y = 0; rect_background.w = w; rect_background.h = h;
+    rect_background.x = 0;
+    rect_background.y = 0;
+    rect_background.w = w;
+    rect_background.h = h;
 
+    //Personaje 1
+    character = IMG_LoadTexture(renderer, "personaje/down1.png");
+    SDL_QueryTexture(character, NULL, NULL, &w, &h);
+    rect_character.x = 100;
+    rect_character.y = 100;
+    rect_character.w = w-4;
+    rect_character.h = h-4;
+
+    //Personaje 2
+    character2 = IMG_LoadTexture(renderer, "personaje/down12.png");
+    SDL_QueryTexture(character2, NULL, NULL, &w, &h);
+    rect_character2.x = 450;
+    rect_character2.y = 150;
+    rect_character2.w = w-4;
+    rect_character2.h = h-4;
+
+    //star
+    star = IMG_LoadTexture(renderer, "personaje/star.png");
+    SDL_QueryTexture(star, NULL, NULL, &w, &h);
+    rect_star.x = rand() % 468;
+    rect_star.y = rand() % 217;
+    rect_star.w = w-4;
+    rect_star.h = h-4;
+
+    //------------------------------------------------
+    //|>>>>>>>>>>>>>>>>>Init Variables<<<<<<<<<<<<<<<<|
+    //------------------------------------------------
+
+    //Personaje 1 y 2
+    int animation_velocity = 15;
+    int velocity = 3;
+    int frame = 0;
+    ostringstream varTTF;
+    varTTF << "0 - 0";
+    bool reload = true;
+
+    //Personaje 1
+    int starCont = 0;
     char orientation = 'd';// d u l r
     int current_sprite = 0;
-    int animation_velocity = 20;
-    int velocity = 10;
-    int frame = 0;
     map<char,vector<SDL_Texture*> >sprites;
     sprites['u'].push_back(IMG_LoadTexture(renderer, "personaje/up1.png"));
     sprites['u'].push_back(IMG_LoadTexture(renderer, "personaje/up2.png"));
@@ -281,18 +328,43 @@ int main( int argc, char* args[] )
     sprites['r'].push_back(IMG_LoadTexture(renderer, "personaje/right1.png"));
     sprites['r'].push_back(IMG_LoadTexture(renderer, "personaje/right2.png"));
 
-    SDL_QueryTexture(sprites['u'][0], NULL, NULL, &w, &h);//que es?
-    rect_character.x = 100;
-    rect_character.y = 100;
-    rect_character.w = w;
-    rect_character.h = h;
+    //Personaje 2
+    int starCont2 = 0;
+    char orientation2 = 'd';// d u l r
+    int current_sprite2 = 0;
+    map<char,vector<SDL_Texture*> >sprites2;
+    sprites2['u'].push_back(IMG_LoadTexture(renderer, "personaje/up12.png"));
+    sprites2['u'].push_back(IMG_LoadTexture(renderer, "personaje/up22.png"));
+    sprites2['d'].push_back(IMG_LoadTexture(renderer, "personaje/down12.png"));
+    sprites2['d'].push_back(IMG_LoadTexture(renderer, "personaje/down22.png"));
+    sprites2['l'].push_back(IMG_LoadTexture(renderer, "personaje/left12.png"));
+    sprites2['l'].push_back(IMG_LoadTexture(renderer, "personaje/left22.png"));
+    sprites2['r'].push_back(IMG_LoadTexture(renderer, "personaje/right12.png"));
+    sprites2['r'].push_back(IMG_LoadTexture(renderer, "personaje/right22.png"));
 
-    texture_npc = IMG_LoadTexture(renderer,"npc.png");
-    SDL_QueryTexture(texture_npc, NULL, NULL, &w, &h);
-    rect_npc.x = 300;
-    rect_npc.y = 100;
-    rect_npc.w = w;
-    rect_npc.h = h;
+
+//    map<char,vector<SDL_Texture*> >sprites;
+//    sprites['u'].push_back(IMG_LoadTexture(renderer, "personaje/up1.png"));
+//    sprites['u'].push_back(IMG_LoadTexture(renderer, "personaje/up2.png"));
+//    sprites['d'].push_back(IMG_LoadTexture(renderer, "personaje/down1.png"));
+//    sprites['d'].push_back(IMG_LoadTexture(renderer, "personaje/down2.png"));
+//    sprites['l'].push_back(IMG_LoadTexture(renderer, "personaje/left1.png"));
+//    sprites['l'].push_back(IMG_LoadTexture(renderer, "personaje/left2.png"));
+//    sprites['r'].push_back(IMG_LoadTexture(renderer, "personaje/right1.png"));
+//    sprites['r'].push_back(IMG_LoadTexture(renderer, "personaje/right2.png"));
+
+//    SDL_QueryTexture(sprites['u'][0], NULL, NULL, &w, &h);//que es?
+//    rect_character.x = 100;
+//    rect_character.y = 100;
+//    rect_character.w = w;
+//    rect_character.h = h;
+
+//    texture_npc = IMG_LoadTexture(renderer,"npc.png");
+//    SDL_QueryTexture(texture_npc, NULL, NULL, &w, &h);
+//    rect_npc.x = 300;
+//    rect_npc.y = 100;
+//    rect_npc.w = w;
+//    rect_npc.h = h;
 
     texture_tile = IMG_LoadTexture(renderer,"tile/crypt.png");//que va de parametro
     rect_tile.x = 32*4;
@@ -300,28 +372,62 @@ int main( int argc, char* args[] )
     rect_tile.w = 32;
     rect_tile.h = 32;
 
-    SDL_QueryTexture(texture_npc, NULL, NULL, &w, &h);//que es?
-    rect_tileset.x = 0;
-    rect_tileset.y = 0;
-    rect_tileset.w = w;
-    rect_tileset.h = h;
+//      Esto borra el mapa
+//    SDL_QueryTexture(texture_npc, NULL, NULL, &w, &h);//que es?
+//    rect_tileset.x = 0;
+//    rect_tileset.y = 0;
+//    rect_tileset.w = w;
+//    rect_tileset.h = h;
 
-    map<string,vector<int> >mapas_down;//que hace cada uno? :/
+    map<string,vector<int> >mapas_down;
     map<string,vector<int> >mapas_over;
     map<string,vector<int> >mapas_collision;
     map<string,vector<Warp*> >warps;
 
-    mapas_down["mapa1"]=getMapa("tile/test.tmx",1);//cada uno es un mapa?
-    mapas_over["mapa1"]=getMapa("tile/test.tmx",2);
-    mapas_collision["mapa1"]=getMapa("tile/test.tmx",3);
-    warps["mapa1"] = getWarps("tile/test.tmx");
+    mapas_down["mapa1"]=getMapa("tile/mapa1.tmx",1);
+    mapas_over["mapa1"]=getMapa("tile/mapa1.tmx",2);
+    mapas_collision["mapa1"]=getMapa("tile/mapa1.tmx",3);
+    warps["mapa1"] = getWarps("tile/mapa1.tmx");
 
-    mapas_down["mapa2"]=getMapa("tile/test2.tmx",1);
-    mapas_over["mapa2"]=getMapa("tile/test2.tmx",2);
-    mapas_collision["mapa2"]=getMapa("tile/test2.tmx",3);
-    warps["mapa2"] = getWarps("tile/test2.tmx");
+    mapas_down["mapa1"]=getMapa("tile/mapa1.tmx",1);
+    mapas_over["mapa1"]=getMapa("tile/mapa1.tmx",2);
+    mapas_collision["mapa1"]=getMapa("tile/mapa1.tmx",3);
+    warps["mapa1"] = getWarps("tile/mapa1.tmx");
+
+    mapas_down["mapa2"]=getMapa("tile/mapa2.tmx",1);
+    mapas_over["mapa2"]=getMapa("tile/mapa2.tmx",2);
+    mapas_collision["mapa2"]=getMapa("tile/mapa2.tmx",3);
+    warps["mapa2"] = getWarps("tile/mapa2.tmx");
+
+    mapas_down["mapa3"]=getMapa("tile/mapa3.tmx",1);
+    mapas_over["mapa3"]=getMapa("tile/mapa3.tmx",2);
+    mapas_collision["mapa3"]=getMapa("tile/mapa3.tmx",3);
+    warps["mapa3"] = getWarps("tile/mapa3.tmx");
+
+    mapas_down["mapa4"]=getMapa("tile/mapa4.tmx",1);
+    mapas_over["mapa4"]=getMapa("tile/mapa4.tmx",2);
+    mapas_collision["mapa4"]=getMapa("tile/mapa4.tmx",3);
+    warps["mapa4"] = getWarps("tile/mapa4.tmx");
+
+    mapas_down["mapa5"]=getMapa("tile/mapa5.tmx",1);
+    mapas_over["mapa5"]=getMapa("tile/mapa5.tmx",2);
+    mapas_collision["mapa5"]=getMapa("tile/mapa5.tmx",3);
+    warps["mapa5"] = getWarps("tile/mapa5.tmx");
+
+    mapas_down["mapa6"]=getMapa("tile/mapa6.tmx",1);
+    mapas_over["mapa6"]=getMapa("tile/mapa6.tmx",2);
+    mapas_collision["mapa6"]=getMapa("tile/mapa6.tmx",3);
+    warps["mapa6"] = getWarps("tile/mapa6.tmx");
 
     string mapa_actual="mapa1";
+
+    //------------------------------------------------
+    //|>>>>>>>>>>>>>>>>>Init Sonido<<<<<<<<<<<<<<<<<<|
+    //------------------------------------------------
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2,2048);
+
+    Mix_Music *musica= Mix_LoadMUS("Kalimba.mp3");
+    Mix_Chunk *sonido= Mix_LoadWAV("sound.wav");
 
     //Main Loop
     while(true)
@@ -334,71 +440,51 @@ int main( int argc, char* args[] )
             }
         }
 
+        //Init current key states
         const Uint8* currentKeyStates = SDL_GetKeyboardState( NULL );
 
-        if(currentKeyStates[ SDL_SCANCODE_D ])
+        //Aqui la musica se repite sin fin -*<x>*-
+        if(!Mix_PlayingMusic())
+            Mix_PlayMusic(musica,1);
+
+        //Personaje 1
+        if(currentKeyStates[ SDL_SCANCODE_D ] && rect_character.x < 289)
         {
             rect_character.x+=velocity;
-            while(collision(rect_character,rect_npc))
-            {
-                rect_character.x-=1;
-            }
+            while(collision(rect_character,rect_character2))
+                rect_character.x-=velocity;
             while(collisionLayer(mapas_collision[mapa_actual],rect_character))
-            {
                 rect_character.x-=1;
-            }
             orientation='r';
         }
-        if(currentKeyStates[ SDL_SCANCODE_A ])
+        if(currentKeyStates[ SDL_SCANCODE_A ] && rect_character.x >= -2)
         {
             rect_character.x-=velocity;
-            while(collision(rect_character,rect_npc))
-            {
-                rect_character.x+=1;
-            }
+            while(collision(rect_character,rect_character2))
+                rect_character.x+=velocity;
             while(collisionLayer(mapas_collision[mapa_actual],rect_character))
-            {
                 rect_character.x+=1;
-            }
             orientation='l';
         }
-        if(currentKeyStates[ SDL_SCANCODE_S ])
+        if(currentKeyStates[ SDL_SCANCODE_S ] && rect_character.y < 287)
         {
             rect_character.y+=velocity;
-            while(collision(rect_character,rect_npc))
-            {
-                rect_character.y-=1;
-            }
-
+            while(collision(rect_character,rect_character2))
+                rect_character.y-=velocity;
             while(collisionLayer(mapas_collision[mapa_actual],rect_character))
-            {
                 rect_character.y-=1;
-            }
             orientation='d';
         }
-        if(currentKeyStates[ SDL_SCANCODE_W ])
+        if(currentKeyStates[ SDL_SCANCODE_W ] && rect_character.y > 0)
         {
             rect_character.y-=velocity;
-            while(collision(rect_character,rect_npc))
-            {
-                rect_character.y+=1;
-            }
+            while(collision(rect_character,rect_character2))
+                rect_character.y+=velocity;
             while(collisionLayer(mapas_collision[mapa_actual],rect_character))
-            {
                 rect_character.y+=1;
-            }
             orientation='u';
         }
-        if(currentKeyStates[ SDL_SCANCODE_LSHIFT ])
-        {
-            velocity=6;
-            animation_velocity=10;
-        }else
-        {
-            velocity=3;
-            animation_velocity=20;
-        }
-
+        //animacion del sprite
         if(frame%animation_velocity==0)
         {
             current_sprite++;
@@ -406,12 +492,127 @@ int main( int argc, char* args[] )
                 current_sprite=0;
         }
 
-        for(int i=0;i<warps[mapa_actual].size();i++)//esto los pociciona?
+        //Personaje 2
+        if(currentKeyStates[ SDL_SCANCODE_RIGHT ] && rect_character2.x < 289)
+        {
+            rect_character2.x+=velocity;
+            while(collision(rect_character2,rect_character))
+                rect_character2.x-=velocity;
+            while(collisionLayer(mapas_collision[mapa_actual],rect_character2))
+                rect_character2.x-=1;
+            orientation2='r';
+        }
+        if(currentKeyStates[ SDL_SCANCODE_LEFT ] && rect_character2.x >= -2)
+        {
+            rect_character2.x-=velocity;
+            while(collision(rect_character2,rect_character))
+                rect_character2.x+=velocity;
+            while(collisionLayer(mapas_collision[mapa_actual],rect_character2))
+                rect_character2.x+=1;
+            orientation2='l';
+        }
+        if(currentKeyStates[ SDL_SCANCODE_DOWN ] && rect_character2.y < 287)
+        {
+            rect_character2.y+=velocity;
+            while(collision(rect_character2,rect_character))
+                rect_character2.y-=velocity;
+            while(collisionLayer(mapas_collision[mapa_actual],rect_character2))
+                rect_character2.y-=1;
+            orientation2='d';
+        }
+        if(currentKeyStates[ SDL_SCANCODE_UP ] && rect_character2.y > 0)
+        {
+            rect_character2.y-=velocity;
+            while(collision(rect_character2,rect_character))
+                rect_character2.y+=velocity;
+            while(collisionLayer(mapas_collision[mapa_actual],rect_character2))
+                rect_character2.y+=1;
+            orientation2='u';
+        }
+        //animacion del sprite
+        if(frame%animation_velocity==0)
+        {
+            current_sprite2++;
+            if(current_sprite2>1)
+                current_sprite2=0;
+        }
+
+//        >>>>>>>>>>Velocity control<<<<<<<<<<<<<<<<<
+//        if(currentKeyStates[ SDL_SCANCODE_LSHIFT ])
+//        {
+//            velocity=6;
+//            animation_velocity=10;
+//        }else
+//        {
+//            velocity=3;
+//            animation_velocity=20;
+//        }
+//
+
+//------------------------------------------------
+//|>>>>>>>>>>>>>>>>>>>>Estrella<<<<<<<<<<<<<<<<<<|
+//------------------------------------------------
+    while(collisionLayer(mapas_collision[mapa_actual],rect_star))
+    {
+        rect_star.x = rand() % 468;
+        rect_star.y = rand() % 217;
+    }
+    if(collision(rect_character,rect_star))
+    {
+        Mix_PlayChannel(-1,sonido,0);
+        do
+        {
+            rect_star.x = rand() % 468;
+            rect_star.y = rand() % 217;
+        }while(collisionLayer(mapas_collision[mapa_actual],rect_star));
+        starCont++;
+        reload = true;
+        varTTF.str("");
+        varTTF.clear();
+        varTTF << starCont << " - " << starCont2;
+        cout<<"Player 1"<<endl;
+    }
+    else if(collision(rect_character2,rect_star))
+    {
+        Mix_PlayChannel(-1,sonido,0);
+        do
+        {
+            rect_star.x = rand() % 468;
+            rect_star.y = rand() % 217;
+        }while(collisionLayer(mapas_collision[mapa_actual],rect_star));
+        starCont2++;
+        reload = true;
+        varTTF.str("");
+        varTTF.clear();
+        varTTF << starCont << " - " << starCont2;
+        cout<<"Player 2"<<endl;
+    }
+
+    if(starCont > 9)
+    {
+        varTTF.str("");
+        varTTF.clear();
+        varTTF << "Jugador 1 ha Ganado!";
+    }
+    else if(starCont2 > 9)
+    {
+        varTTF.str("");
+        varTTF.clear();
+        varTTF << "Jugador 2 ha Ganado!";
+    }
+
+        for(int i=0;i<warps[mapa_actual].size();i++)
         {
             if(collision(warps[mapa_actual][i]->rect,rect_character))
             {
                 rect_character.x=warps[mapa_actual][i]->x;
                 rect_character.y=warps[mapa_actual][i]->y;
+                mapa_actual=warps[mapa_actual][i]->mapa;
+            }
+            if(collision(warps[mapa_actual][i]->rect,rect_character2))
+            {
+                rect_character2.x=warps[mapa_actual][i]->x;
+                rect_character2.y=warps[mapa_actual][i]->y;
                 mapa_actual=warps[mapa_actual][i]->mapa;
             }
         }
@@ -423,12 +624,31 @@ int main( int argc, char* args[] )
         dibujarLayer(renderer,mapas_down[mapa_actual]);
 
         SDL_RenderCopy(renderer, sprites[orientation][current_sprite], NULL, &rect_character);
+        SDL_RenderCopy(renderer, sprites2[orientation2][current_sprite2], NULL, &rect_character2);
+        SDL_RenderCopy(renderer, star, NULL, &rect_star);
 
         dibujarLayer(renderer,mapas_over[mapa_actual]);
 
         //dibujarLayer(renderer,collision_map);
 
-        SDL_RenderCopy(renderer, texture_npc, NULL, &rect_npc);
+        //SDL_RenderCopy(renderer, texture_npc, NULL, &rect_npc);
+        if(starCont > 9 || starCont2 > 9)
+        {
+            showTTF(varTTF.str(), 150);
+            SDL_RenderPresent(renderer);
+            SDL_Delay(2500);
+            starCont = 0;
+            starCont2 = 0;
+            varTTF.str("");
+            varTTF.clear();
+            varTTF << "0 - 0";
+        }
+        else if(reload)
+        {
+            showTTF(varTTF.str(), 220);
+            reload = false;
+        }
+        SDL_RenderCopy(renderer, Message, NULL, &Message_rect);
         SDL_RenderPresent(renderer);
         frame++;
     }

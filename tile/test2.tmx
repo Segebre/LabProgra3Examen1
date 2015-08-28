@@ -321,7 +321,7 @@
   </data>
  </layer>
  <objectgroup name="warps" width="10" height="10">
-  <object name="warp" x="8" y="15" width="30" height="21">
+  <object name="warp" x="205" y="154" width="30" height="21">
    <properties>
     <property name="mapa" value="mapa1"/>
     <property name="x" value="100"/>
